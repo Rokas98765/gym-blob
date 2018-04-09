@@ -2,6 +2,6 @@ from gym.envs.registration import register
 
 register(
     id='blob-v0',
-    entry_point='gym_blob.envs:blobEnv',
+    entry_point='gym_blob.envs:BlobEnv',
 )
 
