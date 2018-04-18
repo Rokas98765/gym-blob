@@ -7,16 +7,12 @@ import time
 import random
 from pygame.locals import *
 
-
-class BlobEnv(gym.Env):
-    metadata = {'render.modes': ['human', 'rgb_array'],
-                'video.frames_per_second': 30
-                }
+class blobEnv(gym.Env):
+    metadata = {'render.modes': ['human']}
 
     def __init__(self):
-        self.action_space = spaces.Discrete(6)
+        self.action_space = spaces.Discrete(4)
         pygame.init()
-        self.clock = pygame.time.Clock()  # sets a clock
         self.display_width = 1002
         self.display_height = 720
         self.gameDisplay = pygame.display.set_mode((self.display_width, self.display_height))
@@ -60,9 +56,9 @@ class BlobEnv(gym.Env):
             if bullet[0] < 0:
                 self.bullets2.remove(bullet)
 
-        if self.step_counter - self.previous_time2 > 50:
+        if self.step_counter - self.previous_time2 > 90:
             self.previous_time2 = self.step_counter
-            self.bullets2.append([self.pos_x + 25, self.pos_y + 24])
+            self.bullets2.append([self.pos_x + 25, self.pos_y])
 
         for b in range(len(self.bullets)):
             self.bullets[b][0] += 6
@@ -71,8 +67,8 @@ class BlobEnv(gym.Env):
             if bullet[0] > 1005:
                 self.bullets.remove(bullet)
 
-        if action == "FIRE":
-            if self.step_counter - self.previous_time > 50:
+        if action == 0:
+            if self.step_counter - self.previous_time > 90:
                 self.previous_time = self.step_counter
                 self.bullets.append([self.x + 25, self.y + 24])
 
@@ -82,13 +78,15 @@ class BlobEnv(gym.Env):
         if self.x > 401 - self.blob_width:
             self.x = 401 - self.blob_width
 
+        if action == 3:
+            None
         if self.y < 0:
             self.y = 0
-        if action == "UP":
+        if action == 1:
             self.y_change = -self.blob_speed
         if self.y > self.display_height - self.blob_height:
             self.y = self.display_height - self.blob_height
-        if action == "DOWN":
+        if action == 2:
             self.y_change = self.blob_speed
 
         # Reset x and y to new position
@@ -111,9 +109,10 @@ class BlobEnv(gym.Env):
                     self.bullets2.remove(bullet)
                     self.lives -= 1
                     reward -= 2
-        env.render()
-        state = pygame.surfarray.array2d(pygame.transform.scale(self.gameDisplay, (100, 100))).flatten()
-        return state, reward, self.lives < 0, {"lives": self.lives, "score": self.score}
+
+        self.render()
+        state = pygame.surfarray.array3d(pygame.transform.scale(self.gameDisplay, (100, 100)))
+        return state, reward, self.lives <= 0, {"lives": self.lives, "score": self.score}
 
     def reset(self):
         # all the following code seems to define the initial game state
@@ -132,11 +131,11 @@ class BlobEnv(gym.Env):
         self.previous_time = 100
         self.previous_time2 = 100
         self.step_counter = 0
-        env.render()
-        state = pygame.surfarray.array2d(pygame.transform.scale(self.gameDisplay, (100, 100))).flatten()
+        self.render()
+        state = pygame.surfarray.array3d(pygame.transform.scale(self.gameDisplay, (100, 100)))
         return state, 0, self.lives < 0, {"lives": self.lives, "score": self.score}
 
-    def render(self, mode='human', close=False):
+    def render(self, mode='human', close=True):
         self.black = (0, 0, 0)
         self.white = (255, 255, 255)
         self.blue = (53, 155, 255)
@@ -162,15 +161,11 @@ class BlobEnv(gym.Env):
                                   pygame.Rect(bullet[0], bullet[1], 0, 0))
 
         self.gameDisplay.blit(pygame.transform.scale(self.gameDisplay, (100, 100)), (0, 0))
-        pygame.display.update()  # update screen
-        self.clock.tick(120)  # moves frame on (fps in parameters)
 
 
 ACTION_MEANING = {
-    0: "NOOP",
-    1: "FIRE",
-    2: "UP",
-    3: "DOWN",
-    4: "UPFIRE",
-    5: "DOWNFIRE",
+    0: "FIRE",
+    1: "UP",
+    2: "DOWN",
+    3: "NOOP"
 }
