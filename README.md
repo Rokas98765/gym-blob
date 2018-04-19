@@ -1,1 +1,3 @@
-# AI project for AQA Computer Science NEA
+# Written by Rokas Stasiulaitis
+# For AQA Computer Science NEA
+# AI Investigation
