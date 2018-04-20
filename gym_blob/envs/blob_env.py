@@ -252,6 +252,10 @@ class blobEnv(gym.Env):
         # Displays the agent on the screen
         self.gameDisplay.blit(self.blobImage, (self.x, self.y))
 
+        # Defines the size of the bullets, used for resizing
+        self.bullet_height = 15
+        self.bullet_width = 36
+        
         # Re-sizes the agents bullets shape to allow the neural network and motion tracer
         # to differentiate between bullets fired by the agents and bullets fired by the
         # hard coded entity
